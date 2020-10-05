@@ -461,6 +461,17 @@ void AP_Frsky_Telem::loop(void)
         _port->begin(AP_SERIALMANAGER_FRSKY_SPORT_BAUD, AP_SERIALMANAGER_FRSKY_BUFSIZE_RX, AP_SERIALMANAGER_FRSKY_BUFSIZE_TX);
     }
     _port->set_unbuffered_writes(true);
+    mavlink_serial_control_t packet;
+	    const uint8_t *data = &packet.data[0];
+            uint8_t count = packet.count;
+            uint16_t n  = _port->txspace();
+            if (n > packet.count) {
+		n = packet.count;
+		}
+            hal.scheduler->delay(5);
+            _port->write(data,n);
+            data += n;
+            count -= n;
 
     while (true) {
         hal.scheduler->delay(1);
